@@ -1,0 +1,118 @@
+/**
+ * 포트폴리오 프로젝트 목록
+ * summary: 카드에 보이는 한 줄 요약
+ * detail: 상세 페이지 개요
+ * diagramType: 아키텍처 | 데이터 플로우 | 시퀀스 중 하나
+ * diagramUrl: 다이어그램 이미지 URL (public/ 또는 외부 URL)
+ */
+
+export type DiagramType = "architecture" | "dataflow" | "sequence";
+
+export interface Project {
+  id: string;
+  title: string;
+  summary: string;
+  detail: string;
+  diagramType: DiagramType;
+  diagramUrl: string | null;
+  /** ERD 이미지 (선택) */
+  erdUrl?: string | null;
+  /** 시퀀스 다이어그램 이미지 (선택) */
+  sequenceDiagramUrl?: string | null;
+  problem: string;
+  solution: string;
+  result: string;
+  stack: string[];
+  githubUrl: string;
+  demoUrl?: string | null;
+  imageUrl?: string | null;
+}
+
+const diagramLabels: Record<DiagramType, string> = {
+  architecture: "아키텍처",
+  dataflow: "데이터 플로우",
+  sequence: "시퀀스 다이어그램",
+};
+
+export function getDiagramLabel(type: DiagramType): string {
+  return diagramLabels[type];
+}
+
+export const projects: Project[] = [
+  {
+    id: "timedeal-service",
+    title: "타임딜 서비스",
+    summary:
+      "특정 시간 오픈 상품 주문 API. 동시성 제어·성능 최적화·레질리언스, k6로 검증.",
+    detail:
+      "특정 시간에 오픈되는 상품에 대한 주문을 처리하는 Spring Boot 기반 REST API입니다.\n\n비관적·낙관적·분산 락(Redis) 세 가지 동시성 전략을 구현하고, Caffeine 캐시·인덱스·커넥션 풀로 성능을 최적화했습니다. Resilience4j Rate limiting·Circuit breaker로 과부하와 장애 전파를 막았고, k6 부하·스파이크·Soak 시나리오로 검증·문서화했습니다.",
+    diagramType: "architecture",
+    diagramUrl: "/image/TimeDeal_Architecture.png",
+    erdUrl: "/image/TimeDeal_ERD.png",
+    sequenceDiagramUrl: "/image/TimeDeal_SequenceDiagram.png",
+    problem: `1. 타임딜 오픈 시점에 동일 상품에 주문이 몰리면서 재고 정합성이 깨질 수 있었습니다.
+2. 낙관적 락만 사용 시 version 충돌로 실패율이 높아졌습니다.
+3. 상품 조회 부하가 커서 p95 지연이 컸습니다.
+4. 메트릭·대시보드 없이 부하 시 병목을 눈으로 확인하기 어려웠고, DB/Redis 장애 시 동작 검증이 필요했습니다.`,
+    solution: `1. 비관적·낙관적·분산 락(Redis) 세 가지 전략을 구현하고 order.lock-strategy로 전환 가능하게 했습니다.
+2. 동일 부하 조건에서 k6로 성능·성공률·에러율을 비교해, 스파이크 구간에서는 비관적 락이 가장 유리함을 확인했습니다.
+3. 상품 목록·상세에 Caffeine 캐시를 도입하고, Resilience4j로 Rate limiting·Circuit breaker를 적용해 과부하와 장애 전파를 완화했습니다.
+4. Prometheus + Grafana 대시보드를 구성하고, DB/Redis 중단·복구 시나리오를 k6로 실측해 문서화했습니다.`,
+    result: `1. 타임딜 스파이크(0→200 VU)에서 비관적 락 기준 약 160 RPS, 주문 201건 성공·에러율 0%를 달성했습니다.
+2. 캐시 도입으로 상품 조회 p95가 38.8ms → 11.6ms로 약 70% 개선되었습니다.
+3. Rate limiting·Circuit breaker 적용 후 성공률 99.87%를 유지하며 시스템 부하를 완화했습니다.
+4. Prometheus·Grafana로 RPS·레이턴시·JVM 메모리를 실시간 확인할 수 있고, 장애 시나리오 결과를 PERF_RESULT에 정리했습니다.`,
+    stack: [
+      "Java 21",
+      "Spring Boot",
+      "Spring Data JPA",
+      "Querydsl",
+      "MySQL",
+      "Redis",
+      "JWT",
+      "Caffeine",
+      "Resilience4j",
+      "Springdoc OpenAPI",
+      "Testcontainers",
+      "k6",
+    ],
+    githubUrl: "https://github.com/jinhyuk9714/timedeal-service",
+    demoUrl: null,
+    imageUrl: null,
+  },
+  {
+    id: "msa-shop",
+    title: "MSA Shop",
+    summary:
+      "쇼핑몰 MSA. 6개 서비스 분리·SAGA/Outbox·RabbitMQ 이벤트·Docker/K8s/Helm.",
+    detail:
+      "쇼핑몰 도메인으로 마이크로서비스를 설계·구현한 프로젝트입니다. User, Product, Order, Payment, Settlement 5개 도메인 서비스와 API Gateway로 경계를 나누고, 각 서비스별 독립 DB(MySQL)를 사용합니다.\n\n주문 흐름은 재고 예약 → 결제 → 주문 저장 순입니다. 실패 시 SAGA로 재고 복구·결제 취소를 수행하고, 결제 성공 후 주문 저장 실패 시 Outbox 패턴으로 보상 트랜잭션을 처리합니다. 결제 완료는 RabbitMQ로 발행해 settlement-service가 일/월 매출을 집계합니다.\n\nGateway에서 JWT 검증·Rate Limit·통합 Swagger를 담당하고, 장바구니(CRUD)·상품 검색·카테고리, Resilience4j Retry·CircuitBreaker, Prometheus·Grafana·Zipkin 관측성, CI(E2E 포함)·Helm·HPA까지 구현했습니다.",
+    diagramType: "architecture",
+    diagramUrl: "/image/MsaShop_Architecture.png",
+    erdUrl: "/image/MsaShop_ERD.png",
+    sequenceDiagramUrl: "/image/MsaShop_SequenceDiagram.png",
+    problem: `1. 주문·결제·재고가 서로 다른 서비스와 DB에 분산되어 있어, 한 단계 실패 시 이전 단계를 되돌려야 했습니다.
+2. 결제는 성공했는데 주문 저장만 실패하는 경우, 단순 메시지 발행으로는 유실·중복 가능성이 있어 일관성을 보장하기 어려웠습니다.
+3. 여러 서비스를 한 번에 기동·배포·검증할 수 있는 환경이 필요했습니다.`,
+    solution: `1. 주문 흐름을 재고 예약 → 결제 → 주문 저장 순으로 정의하고, 각 단계 실패 시 SAGA로 재고 복구·결제 취소를 수행했습니다.
+2. 결제 성공 후 주문 저장 실패 구간은 Outbox 테이블에 보상 이벤트를 저장한 뒤 스케줄러가 폴링해 결제 취소·재고 복구를 호출하도록 해 메시지 유실 없이 보상을 보장했습니다.
+3. API Gateway를 단일 진입점으로 두고, Docker Compose·K8s·Helm으로 전체 스택을 기동·배포하며, CI에서 단위·통합·E2E 테스트를 자동 실행하게 했습니다.`,
+    result: `1. 6개 서비스 + Gateway를 Docker Compose로 일괄 기동하고, E2E 스크립트(회원가입·로그인·주문·장바구니·실패 시나리오 등 9개)로 검증합니다.
+2. SAGA·Outbox로 주문·결제·정산 간 보상 트랜잭션을 처리하고, RabbitMQ 이벤트 기반 정산·매출 집계를 구현했습니다.
+3. Helm 차트로 K8s 배포·업그레이드가 가능하며, order-service HPA, Prometheus·Grafana·Zipkin 관측성, ghcr.io 이미지 CI/CD까지 구성했습니다.`,
+    stack: [
+      "Java 21",
+      "Spring Boot",
+      "Spring Cloud Gateway",
+      "Spring Data JPA",
+      "MySQL",
+      "RabbitMQ",
+      "Docker",
+      "Kubernetes",
+      "Helm",
+    ],
+    githubUrl: "https://github.com/jinhyuk9714/msa-shop",
+    demoUrl: null,
+    imageUrl: null,
+  },
+];
