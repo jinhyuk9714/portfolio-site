@@ -56,27 +56,79 @@ export const projects: Project[] = [
     diagramType: "architecture",
     diagramUrl: null,
     diagramMermaid: `flowchart LR
-  subgraph Client
-    A[앱/웹]
-  end
-  subgraph Backend
-    B[Spring Boot]
-    C[JWT]
-    D[Spring Data JPA]
-  end
-  subgraph Storage
-    E[(MySQL)]
-    F[AWS S3]
-  end
-  A --> B
-  B --> C
-  B --> D
-  D --> E
-  B --> F`,
+    subgraph Client
+      FE[프론트엔드]
+    end
+    subgraph Backend["Spring Boot"]
+      API[REST API]
+      JWT[JWT 검증]
+      API --> JWT
+    end
+    subgraph Data
+      MySQL[(MySQL)]
+      S3[(S3)]
+    end
+    FE --> API
+    API --> MySQL
+    API --> S3`,
     erdUrl: null,
-    erdMermaid: null,
+    erdMermaid: `erDiagram
+    users ||--o{ album : "소유"
+    album ||--o{ letter : "포함"
+    letter ||--o{ photo : "포함"
+
+    users {
+      bigint user_id PK
+      varchar username UK
+      varchar nickname UK
+      varchar email UK
+      varchar role
+    }
+    album {
+      bigint album_id PK
+      bigint user_id FK
+      varchar title
+      varchar album_color
+      boolean visibility
+      varchar sticker_url
+    }
+    letter {
+      bigint letter_id PK
+      bigint album_id FK
+      varchar letter_title
+      text content
+      datetime created_at
+      boolean is_anonymous
+      varchar letter_color
+    }
+    photo {
+      bigint photo_id PK
+      bigint letter_id FK
+      varchar url
+      varchar comment
+      varchar sticker_url
+    }`,
     sequenceDiagramUrl: null,
-    sequenceDiagramMermaid: null,
+    sequenceDiagramMermaid: `sequenceDiagram
+    participant C as 클라이언트
+    participant API as UserController
+    participant US as UserService
+    participant UR as UserRepository
+    participant JWT as JwtTokenProvider
+
+    C->>+API: POST /api/auth/login (username, password)
+    API->>+US: authenticateUser(username, password)
+    US->>UR: findByUsername(username)
+    UR-->>US: Optional User
+    US->>US: passwordEncoder.matches()
+    US-->>-API: Optional User
+    alt 인증 성공
+      API->>JWT: createToken(username)
+      JWT-->>API: token
+      API-->>C: 200 success, data: token
+    else 인증 실패
+      API-->>C: 401 success: false, error
+    end`,
     problem: `1. 편지 목록 조회 시 편지별 사진 개수를 위해 N+1 쿼리(1 + 30회)가 발생해 응답 시간이 길었습니다.
 2. 앨범 조회 시 owner, letters를 Lazy 로딩으로 3회 쿼리가 발생했습니다.
 3. 성능 개선 전·후를 정량적으로 비교할 수 있는 부하 테스트 환경이 없었습니다.
