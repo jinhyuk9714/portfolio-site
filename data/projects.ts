@@ -40,6 +40,47 @@ export function getDiagramLabel(type: DiagramType): string {
 
 export const projects: Project[] = [
   {
+    id: "memory-of-year",
+    title: "Memory of Year",
+    summary:
+      "앨범·편지·사진 관리 REST API. N+1 최적화·k6 부하테스트·Docker·CI/CD.",
+    detail:
+      "멋쟁이사자처럼 12기 팀 멋삼핑에서 제작한 UGC 앨범 서비스 백엔드입니다. 앨범·편지·사진·스티커 CRUD, JWT 인증·로그아웃(토큰 무효화), AWS S3 미디어 저장, Swagger API 문서를 제공합니다.\n\n편지 목록 API에서 편지별 사진 개수(photoCount) 조회 시 N+1 쿼리(31회)가 발생해 @Query 서브쿼리로 1회로 최적화했고, 앨범 조회는 @EntityGraph로 3회→1회로 개선했습니다. k6로 회원가입·로그인·앨범·편지 API 부하를 측정하고 Before/After 결과를 문서화했습니다. Docker Compose로 MySQL + 앱을 한 번에 기동하며, GitHub Actions CI와 JaCoCo 커버리지 리포트를 구성했습니다.",
+    diagramType: "architecture",
+    diagramUrl: null, // 필요 시 public/image/ 에 이미지 넣고 예: "/image/MemoryOfYear_Architecture.png"
+    erdUrl: null,
+    sequenceDiagramUrl: null,
+    problem: `1. 편지 목록 조회 시 편지별 사진 개수를 위해 N+1 쿼리(1 + 30회)가 발생해 응답 시간이 길었습니다.
+2. 앨범 조회 시 owner, letters를 Lazy 로딩으로 3회 쿼리가 발생했습니다.
+3. 성능 개선 전·후를 정량적으로 비교할 수 있는 부하 테스트 환경이 없었습니다.
+4. 로컬에서 MySQL 설정 없이 실행·배포 환경을 빠르게 구성하기 어려웠습니다.`,
+    solution: `1. LetterRepository에 서브쿼리 COUNT를 사용한 findLettersWithPhotoCountByAlbumId로 1회 쿼리로 최적화했습니다.
+2. AlbumRepository에 @EntityGraph로 owner, letters를 한 번에 fetch하는 findByIdWithOwnerAndLetters를 추가했습니다.
+3. k6 스크립트(00~04)로 스모크·회원가입·로그인·앨범·편지 부하를 측정하고, APP_PERF_USE_N1_LETTERS로 N+1 Before/After를 재현·비교했습니다.
+4. Docker Compose로 MySQL 8 + 앱을 정의하고 depends_on + healthcheck로 순서 기동하게 했습니다. GitHub Actions CI, JaCoCo 리포트를 추가했습니다.`,
+    result: `1. 편지 목록 API: DB 쿼리 31회 → 1회, p95 22.8ms → 13.8ms(↓40%), 평균 11.5ms → 6.7ms(↓42%)로 개선했습니다.
+2. 앨범 조회 API: 3회 → 1회 쿼리, 인덱스(idx_album_owner, idx_letter_album_id 등) 추가로 조회 성능을 최적화했습니다.
+3. k6 부하테스트 결과(회원가입 16.5 RPS, 로그인 49.7 RPS, 앨범 143.7 RPS, 편지 96.7 RPS)를 README에 문서화했습니다.
+4. docker compose up --build 한 번에 MySQL + 앱 기동, push 시 자동 테스트·커버리지 리포트를 구성했습니다.`,
+    stack: [
+      "Java 17",
+      "Spring Boot 3",
+      "Spring Security",
+      "JWT",
+      "Spring Data JPA",
+      "MySQL",
+      "H2",
+      "AWS S3",
+      "Swagger",
+      "Docker",
+      "k6",
+      "JaCoCo",
+    ],
+    githubUrl: "https://github.com/jinhyuk9714/memory_of_year",
+    demoUrl: null,
+    imageUrl: null,
+  },
+  {
     id: "timedeal-service",
     title: "타임딜 서비스",
     summary:
