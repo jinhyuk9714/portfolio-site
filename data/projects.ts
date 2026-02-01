@@ -180,7 +180,7 @@ export const projects: Project[] = [
     ],
     githubUrl: "https://github.com/jinhyuk9714/memory_of_year",
     demoUrl: null,
-    imageUrl: null,
+    imageUrl: "/image/MemoryOfYear_Thumbnail.png",
   },
   {
     id: "timedeal-service",
