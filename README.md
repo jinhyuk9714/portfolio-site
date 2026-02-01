@@ -36,3 +36,5 @@ GitHub에 푸시해 두었다면 [Vercel](https://vercel.com)에서 바로 배�
 - `components/Hero.tsx` — 상단 히어로
 - `components/ProjectCard.tsx`, `ProjectList.tsx` — 프로젝트 카드
 - `components/Footer.tsx` — 연락처 푸터
+
+<!-- 테스트 푸시 -->
