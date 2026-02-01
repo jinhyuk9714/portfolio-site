@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { projects, getDiagramLabel } from "@/data/projects";
 import ImageLightbox from "@/components/ImageLightbox";
+import MermaidDiagram from "@/components/MermaidDiagram";
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -68,28 +69,37 @@ function NumberedBlock({ text }: { text: string }) {
   );
 }
 
-/** 다이어그램 이미지 블록 (제목 + 클릭 시 확대 이미지) */
+/** 다이어그램 블록: Mermaid 코드 또는 이미지 URL */
 function DiagramBlock({
   title,
   url,
+  mermaidCode,
 }: {
   title: string;
   url: string | null | undefined;
+  mermaidCode?: string | null;
 }) {
-  if (!url) return null;
+  const hasMermaid = mermaidCode?.trim();
+  const hasUrl = url?.trim();
+  if (!hasMermaid && !hasUrl) return null;
+
   return (
     <>
       <SectionTitle>{title}</SectionTitle>
-      <div className="relative w-full rounded-xl overflow-hidden bg-surface border border-surface-border">
-        <ImageLightbox src={url} alt={title}>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={url}
-            alt={title}
-            className="w-full h-auto object-contain"
-          />
-        </ImageLightbox>
-      </div>
+      {hasMermaid ? (
+        <MermaidDiagram code={mermaidCode!} />
+      ) : (
+        <div className="relative w-full rounded-xl overflow-hidden bg-surface border border-surface-border">
+          <ImageLightbox src={url!} alt={title}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={url!}
+              alt={title}
+              className="w-full h-auto object-contain"
+            />
+          </ImageLightbox>
+        </div>
+      )}
     </>
   );
 }
@@ -146,15 +156,20 @@ export default async function ProjectPage({ params }: Props) {
         <SectionTitle>개요</SectionTitle>
         <OverviewBlock text={project.detail} />
 
-        <DiagramBlock title="아키텍처" url={project.diagramUrl} />
-        <DiagramBlock title="ERD" url={project.erdUrl} />
-        <DiagramBlock title="시퀀스 다이어그램" url={project.sequenceDiagramUrl} />
+        <DiagramBlock title="아키텍처" url={project.diagramUrl} mermaidCode={project.diagramMermaid} />
+        <DiagramBlock title="ERD" url={project.erdUrl} mermaidCode={project.erdMermaid} />
+        <DiagramBlock title="시퀀스 다이어그램" url={project.sequenceDiagramUrl} mermaidCode={project.sequenceDiagramMermaid} />
 
-        {!project.diagramUrl && !project.erdUrl && !project.sequenceDiagramUrl ? (
+        {!project.diagramUrl &&
+        !project.diagramMermaid &&
+        !project.erdUrl &&
+        !project.erdMermaid &&
+        !project.sequenceDiagramUrl &&
+        !project.sequenceDiagramMermaid ? (
           <>
             <SectionTitle>{diagramLabel}</SectionTitle>
             <p className="text-sm text-ink-tertiary py-8 border border-dashed border-surface-border rounded-xl text-center">
-              다이어그램 이미지를 추가하려면 data/projects.ts의 diagramUrl·erdUrl·sequenceDiagramUrl에 이미지 경로를 넣어 주세요.
+              data/projects.ts에서 diagramUrl·erdUrl·sequenceDiagramUrl(이미지) 또는 diagramMermaid·erdMermaid·sequenceDiagramMermaid(Mermaid 코드)를 넣어 주세요.
             </p>
           </>
         ) : null}

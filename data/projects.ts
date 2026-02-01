@@ -4,6 +4,7 @@
  * detail: 상세 페이지 개요
  * diagramType: 아키텍처 | 데이터 플로우 | 시퀀스 중 하나
  * diagramUrl: 다이어그램 이미지 URL (public/ 또는 외부 URL)
+ * diagramMermaid / erdMermaid / sequenceDiagramMermaid: Mermaid 코드 문자열 (이미지 대신 사용, 있으면 우선 표시)
  */
 
 export type DiagramType = "architecture" | "dataflow" | "sequence";
@@ -15,10 +16,16 @@ export interface Project {
   detail: string;
   diagramType: DiagramType;
   diagramUrl: string | null;
+  /** 아키텍처 다이어그램 Mermaid 코드 (이미지 대신 사용 가능) */
+  diagramMermaid?: string | null;
   /** ERD 이미지 (선택) */
   erdUrl?: string | null;
+  /** ERD Mermaid 코드 (이미지 대신 사용 가능) */
+  erdMermaid?: string | null;
   /** 시퀀스 다이어그램 이미지 (선택) */
   sequenceDiagramUrl?: string | null;
+  /** 시퀀스 다이어그램 Mermaid 코드 (이미지 대신 사용 가능) */
+  sequenceDiagramMermaid?: string | null;
   problem: string;
   solution: string;
   result: string;
@@ -47,9 +54,29 @@ export const projects: Project[] = [
     detail:
       "멋쟁이사자처럼 12기 팀 멋삼핑에서 제작한 UGC 앨범 서비스 백엔드입니다. 앨범·편지·사진·스티커 CRUD, JWT 인증·로그아웃(토큰 무효화), AWS S3 미디어 저장, Swagger API 문서를 제공합니다.\n\n편지 목록 API에서 편지별 사진 개수(photoCount) 조회 시 N+1 쿼리(31회)가 발생해 @Query 서브쿼리로 1회로 최적화했고, 앨범 조회는 @EntityGraph로 3회→1회로 개선했습니다. k6로 회원가입·로그인·앨범·편지 API 부하를 측정하고 Before/After 결과를 문서화했습니다. Docker Compose로 MySQL + 앱을 한 번에 기동하며, GitHub Actions CI와 JaCoCo 커버리지 리포트를 구성했습니다.",
     diagramType: "architecture",
-    diagramUrl: null, // 필요 시 public/image/ 에 이미지 넣고 예: "/image/MemoryOfYear_Architecture.png"
+    diagramUrl: null,
+    diagramMermaid: `flowchart LR
+  subgraph Client
+    A[앱/웹]
+  end
+  subgraph Backend
+    B[Spring Boot]
+    C[JWT]
+    D[Spring Data JPA]
+  end
+  subgraph Storage
+    E[(MySQL)]
+    F[AWS S3]
+  end
+  A --> B
+  B --> C
+  B --> D
+  D --> E
+  B --> F`,
     erdUrl: null,
+    erdMermaid: null,
     sequenceDiagramUrl: null,
+    sequenceDiagramMermaid: null,
     problem: `1. 편지 목록 조회 시 편지별 사진 개수를 위해 N+1 쿼리(1 + 30회)가 발생해 응답 시간이 길었습니다.
 2. 앨범 조회 시 owner, letters를 Lazy 로딩으로 3회 쿼리가 발생했습니다.
 3. 성능 개선 전·후를 정량적으로 비교할 수 있는 부하 테스트 환경이 없었습니다.
