@@ -26,6 +26,8 @@ export interface Project {
   sequenceDiagramUrl?: string | null;
   /** 시퀀스 다이어그램 Mermaid 코드 (이미지 대신 사용 가능) */
   sequenceDiagramMermaid?: string | null;
+  /** 시퀀스 다이어그램 여러 개 (제목 + Mermaid, 있으면 단일 시퀀스 대신 사용) */
+  sequenceDiagrams?: { title: string; mermaid: string }[];
   problem: string;
   solution: string;
   result: string;
@@ -109,26 +111,47 @@ export const projects: Project[] = [
       varchar sticker_url
     }`,
     sequenceDiagramUrl: null,
-    sequenceDiagramMermaid: `sequenceDiagram
-    participant C as 클라이언트
-    participant API as UserController
-    participant US as UserService
-    participant UR as UserRepository
-    participant JWT as JwtTokenProvider
-
-    C->>+API: POST /api/auth/login (username, password)
-    API->>+US: authenticateUser(username, password)
-    US->>UR: findByUsername(username)
-    UR-->>US: Optional User
-    US->>US: passwordEncoder.matches()
-    US-->>-API: Optional User
-    alt 인증 성공
-      API->>JWT: createToken(username)
-      JWT-->>API: token
-      API-->>C: 200 success, data: token
-    else 인증 실패
-      API-->>C: 401 success: false, error
+    sequenceDiagramMermaid: null,
+    sequenceDiagrams: [
+      {
+        title: "로그인",
+        mermaid: `sequenceDiagram
+    C->>API: POST /api/auth/login
+    API->>US: authenticateUser
+    US->>UR: findByUsername
+    alt 성공
+        API->>JWT: createToken
+        API-->>C: 200 { token }
+    else 실패
+        API-->>C: 401
     end`,
+      },
+      {
+        title: "앨범 생성",
+        mermaid: `sequenceDiagram
+    C->>API: POST /api/albums/create
+    API->>AS: hasAlbum, createAlbum
+    AS->>AR: save
+    API-->>C: 201 { Album }`,
+      },
+      {
+        title: "편지 작성",
+        mermaid: `sequenceDiagram
+    C->>API: POST /api/albums/{id}/create
+    API->>LS: createLetter
+    LS->>LR: save
+    API-->>C: 201 { Letter }`,
+      },
+      {
+        title: "사진 업로드",
+        mermaid: `sequenceDiagram
+    C->>API: POST /api/letters/{id}/photos
+    API->>PS: addPhoto
+    PS->>S3: uploadFile
+    PS->>PR: save
+    API-->>C: 201 { Photo }`,
+      },
+    ],
     problem: `1. 편지 목록 조회 시 편지별 사진 개수를 위해 N+1 쿼리(1 + 30회)가 발생해 응답 시간이 길었습니다.
 2. 앨범 조회 시 owner, letters를 Lazy 로딩으로 3회 쿼리가 발생했습니다.
 3. 성능 개선 전·후를 정량적으로 비교할 수 있는 부하 테스트 환경이 없었습니다.

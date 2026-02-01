@@ -69,37 +69,54 @@ function NumberedBlock({ text }: { text: string }) {
   );
 }
 
-/** 다이어그램 블록: Mermaid 코드 또는 이미지 URL */
+/** 다이어그램 블록: Mermaid 코드 또는 이미지 URL. collapsible이면 접기 가능 */
 function DiagramBlock({
   title,
   url,
   mermaidCode,
+  collapsible = false,
 }: {
   title: string;
   url: string | null | undefined;
   mermaidCode?: string | null;
+  collapsible?: boolean;
 }) {
   const hasMermaid = mermaidCode?.trim();
   const hasUrl = url?.trim();
   if (!hasMermaid && !hasUrl) return null;
 
+  const content = hasMermaid ? (
+    <MermaidDiagram code={mermaidCode!} />
+  ) : (
+    <div className="relative w-full rounded-xl overflow-hidden bg-surface border border-surface-border">
+      <ImageLightbox src={url!} alt={title}>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={url!}
+          alt={title}
+          className="w-full h-auto object-contain"
+        />
+      </ImageLightbox>
+    </div>
+  );
+
+  if (collapsible) {
+    return (
+      <details className="group mt-6 first:mt-0">
+        <summary className="flex cursor-pointer list-none items-center gap-3 text-xs font-semibold uppercase tracking-[0.2em] text-ink-tertiary hover:text-ink-secondary [&::-webkit-details-marker]:hidden">
+          <span className="w-6 h-px bg-accent/50 shrink-0" aria-hidden />
+          {title}
+          <span className="ml-auto text-accent/70 group-open:rotate-180 transition-transform" aria-hidden>▼</span>
+        </summary>
+        <div className="mt-4">{content}</div>
+      </details>
+    );
+  }
+
   return (
     <>
       <SectionTitle>{title}</SectionTitle>
-      {hasMermaid ? (
-        <MermaidDiagram code={mermaidCode!} />
-      ) : (
-        <div className="relative w-full rounded-xl overflow-hidden bg-surface border border-surface-border">
-          <ImageLightbox src={url!} alt={title}>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={url!}
-              alt={title}
-              className="w-full h-auto object-contain"
-            />
-          </ImageLightbox>
-        </div>
-      )}
+      {content}
     </>
   );
 }
@@ -157,19 +174,39 @@ export default async function ProjectPage({ params }: Props) {
         <OverviewBlock text={project.detail} />
 
         <DiagramBlock title="아키텍처" url={project.diagramUrl} mermaidCode={project.diagramMermaid} />
-        <DiagramBlock title="ERD" url={project.erdUrl} mermaidCode={project.erdMermaid} />
-        <DiagramBlock title="시퀀스 다이어그램" url={project.sequenceDiagramUrl} mermaidCode={project.sequenceDiagramMermaid} />
+        <DiagramBlock title="ERD" url={project.erdUrl} mermaidCode={project.erdMermaid} collapsible />
+        {project.sequenceDiagrams?.length ? (
+          <>
+            <SectionTitle>시퀀스 다이어그램</SectionTitle>
+            <div className="space-y-2">
+              {project.sequenceDiagrams.map(({ title, mermaid }) => (
+                <details key={title} className="group rounded-lg border border-surface-border bg-surface/50">
+                  <summary className="cursor-pointer list-none px-4 py-3 text-sm font-medium text-ink-secondary hover:text-ink-primary [&::-webkit-details-marker]:hidden flex items-center justify-between gap-2">
+                    {title}
+                    <span className="text-accent/70 text-xs group-open:rotate-180 transition-transform shrink-0">▼</span>
+                  </summary>
+                  <div className="border-t border-surface-border px-4 py-3">
+                    <MermaidDiagram code={mermaid} />
+                  </div>
+                </details>
+              ))}
+            </div>
+          </>
+        ) : (
+          <DiagramBlock title="시퀀스 다이어그램" url={project.sequenceDiagramUrl} mermaidCode={project.sequenceDiagramMermaid} />
+        )}
 
         {!project.diagramUrl &&
         !project.diagramMermaid &&
         !project.erdUrl &&
         !project.erdMermaid &&
         !project.sequenceDiagramUrl &&
-        !project.sequenceDiagramMermaid ? (
+        !project.sequenceDiagramMermaid &&
+        !project.sequenceDiagrams?.length ? (
           <>
             <SectionTitle>{diagramLabel}</SectionTitle>
             <p className="text-sm text-ink-tertiary py-8 border border-dashed border-surface-border rounded-xl text-center">
-              data/projects.ts에서 diagramUrl·erdUrl·sequenceDiagramUrl(이미지) 또는 diagramMermaid·erdMermaid·sequenceDiagramMermaid(Mermaid 코드)를 넣어 주세요.
+              data/projects.ts에서 diagramUrl·erdUrl·sequenceDiagramUrl(이미지), diagramMermaid·erdMermaid·sequenceDiagramMermaid(Mermaid), 또는 sequenceDiagrams 배열을 넣어 주세요.
             </p>
           </>
         ) : null}
