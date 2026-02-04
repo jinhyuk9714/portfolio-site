@@ -4,6 +4,8 @@ import "./globals.css";
 import { profile } from "@/data/profile";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import ThemeToggle from "@/components/ThemeToggle";
+import ScrollProgress from "@/components/ScrollProgress";
+import CommandPalette from "@/components/CommandPalette";
 
 const sora = Sora({
   subsets: ["latin"],
@@ -37,9 +39,11 @@ export default function RootLayout({
     <html lang="ko" className={`${sora.variable} ${jetbrainsMono.variable} dark`} suppressHydrationWarning>
       <body className="font-sans antialiased min-h-screen flex flex-col bg-surface text-ink-primary selection:bg-accent/30 selection:text-white transition-colors duration-300">
         <ThemeProvider>
+          <ScrollProgress />
           <div className="noise-overlay" aria-hidden />
           <div className="scanlines" aria-hidden />
           <ThemeToggle />
+          <CommandPalette />
           {children}
         </ThemeProvider>
       </body>

@@ -3,6 +3,7 @@ import Link from "next/link";
 import { projects, getDiagramLabel } from "@/data/projects";
 import ImageLightbox from "@/components/ImageLightbox";
 import MermaidDiagram from "@/components/MermaidDiagram";
+import PageTransition from "@/components/PageTransition";
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -181,6 +182,7 @@ export default async function ProjectPage({ params }: Props) {
   const diagramLabel = getDiagramLabel(project.diagramType);
 
   return (
+    <PageTransition>
     <main className="relative z-10 flex-1 px-6 py-16 sm:py-24">
       {/* Background */}
       <div className="absolute inset-0 bg-grid opacity-15 pointer-events-none" aria-hidden />
@@ -414,5 +416,6 @@ export default async function ProjectPage({ params }: Props) {
         </div>
       </div>
     </main>
+    </PageTransition>
   );
 }
