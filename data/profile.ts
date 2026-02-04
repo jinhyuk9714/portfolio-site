@@ -18,4 +18,7 @@ export const profile = {
   githubUrl: "https://github.com/jinhyuk9714",
   linkedInUrl: null as string | null,
   profileImageUrl: null as string | null,
+
+  // 이력서 (PDF 파일을 public/resume.pdf에 저장)
+  resumeUrl: "/resume.pdf" as string | null,
 };
