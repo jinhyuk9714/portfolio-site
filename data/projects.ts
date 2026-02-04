@@ -258,4 +258,199 @@ export const projects: Project[] = [
     demoUrl: null,
     imageUrl: null,
   },
+  {
+    id: "running-app",
+    title: "Running App",
+    summary:
+      "NRC 스타일 풀스택 러닝 앱. Spring Boot + React + SwiftUI, 이벤트 비동기·Redis 캐싱·29% 성능 향상.",
+    detail:
+      "Nike Run Club 스타일의 풀스택 러닝 트래킹 애플리케이션입니다. Spring Boot 백엔드, React 웹 프론트엔드, SwiftUI iOS 네이티브 앱으로 구성됩니다.\n\n활동 기록, 레벨 시스템(Lv.1-10), 챌린지(6종), 훈련 계획(5K/10K/하프 × 초급/중급/고급 9종), GPS 경로 추적, HealthKit 연동(심박·케이던스·걸음 수)을 지원합니다.\n\n활동 저장 시 Spring Events + @Async로 레벨·챌린지·훈련 계획 진행률을 비동기 업데이트하며, Redis 캐싱으로 조회 응답 시간을 70-86% 단축했습니다. k6 부하테스트로 최적화 전후를 비교해 처리량 29% 향상을 검증했고, NCP에 HTTPS로 배포했습니다.",
+    diagramType: "architecture",
+    diagramUrl: null,
+    diagramMermaid: `flowchart LR
+    subgraph Clients
+      Web[React Web]
+      iOS[SwiftUI iOS]
+    end
+    subgraph Backend["Spring Boot"]
+      API[REST API]
+      JWT[JWT 인증]
+      Event[Spring Events]
+      Async[Async Listeners]
+      API --> JWT
+      API --> Event
+      Event --> Async
+    end
+    subgraph Data
+      PG[(PostgreSQL)]
+      Redis[(Redis)]
+    end
+    subgraph Infra
+      Nginx[Nginx]
+      NCP[NCP Cloud]
+    end
+    Web --> Nginx
+    iOS --> Nginx
+    Nginx --> API
+    API --> PG
+    API --> Redis
+    Async --> PG`,
+    erdUrl: null,
+    erdMermaid: `erDiagram
+    users ||--o{ running_activity : "기록"
+    users ||--o{ user_challenge : "참여"
+    users ||--o{ user_plan : "등록"
+    challenge ||--o{ user_challenge : "포함"
+    training_plan ||--o{ plan_week : "구성"
+    training_plan ||--o{ user_plan : "포함"
+
+    users {
+      bigint id PK
+      varchar email UK
+      varchar password
+      varchar nickname
+      int level
+      double total_distance
+      double weight
+      double height
+    }
+    running_activity {
+      bigint id PK
+      bigint user_id FK
+      double distance
+      int duration
+      double pace
+      int heart_rate
+      int cadence
+      json route
+      varchar memo
+      datetime created_at
+    }
+    challenge {
+      bigint id PK
+      varchar name
+      enum type
+      double target_distance
+      int target_count
+      date start_date
+      date end_date
+      int recommended_level
+    }
+    user_challenge {
+      bigint id PK
+      bigint user_id FK
+      bigint challenge_id FK
+      double current_distance
+      int current_count
+      datetime joined_at
+      datetime completed_at
+    }
+    training_plan {
+      bigint id PK
+      varchar name
+      enum goal_type
+      enum difficulty
+    }
+    plan_week {
+      bigint id PK
+      bigint plan_id FK
+      int week_number
+      double target_distance
+      int target_run_count
+    }
+    user_plan {
+      bigint id PK
+      bigint user_id FK
+      bigint plan_id FK
+      int current_week
+      datetime started_at
+      datetime completed_at
+    }`,
+    sequenceDiagramUrl: null,
+    sequenceDiagramMermaid: null,
+    sequenceDiagrams: [
+      {
+        title: "활동 기록 (이벤트 비동기)",
+        mermaid: `sequenceDiagram
+    participant C as Client
+    participant API as Controller
+    participant AS as ActivityService
+    participant E as EventPublisher
+    participant UL as UserLevelListener
+    participant CL as ChallengeListener
+    participant PL as PlanListener
+    C->>API: POST /api/activities
+    API->>AS: createActivity
+    AS->>AS: save to DB
+    AS->>E: publish ActivityCreatedEvent
+    AS-->>API: Activity
+    API-->>C: 201 Created
+    Note over E,PL: AFTER_COMMIT 비동기 처리
+    par 병렬 실행
+      E->>UL: onActivityCreated
+      UL->>UL: updateUserLevel
+    and
+      E->>CL: onActivityCreated
+      CL->>CL: updateChallengeProgress
+    and
+      E->>PL: onActivityCreated
+      PL->>PL: updatePlanProgress
+    end`,
+      },
+      {
+        title: "챌린지 참여",
+        mermaid: `sequenceDiagram
+    C->>API: POST /api/challenges/{id}/join
+    API->>CS: joinChallenge
+    CS->>CS: validate eligibility
+    CS->>UC: save UserChallenge
+    API-->>C: 200 OK`,
+      },
+      {
+        title: "훈련 계획 시작",
+        mermaid: `sequenceDiagram
+    C->>API: POST /api/plans/{id}/start
+    API->>PS: startPlan
+    PS->>PS: check not already enrolled
+    PS->>UP: save UserPlan
+    API-->>C: 200 OK`,
+      },
+    ],
+    problem: `1. 활동 저장 시 레벨·챌린지·훈련 계획 업데이트를 동기로 처리하면 응답 시간이 길어지고 트랜잭션 범위가 커집니다.
+2. 활동 요약, 챌린지 목록 등 빈번한 조회 API가 매번 DB를 조회해 응답 시간이 느렸습니다.
+3. JOIN FETCH 없이 연관 엔티티를 조회하면 N+1 쿼리가 발생했습니다.
+4. 최적화 효과를 정량적으로 측정·비교할 부하 테스트 환경이 없었습니다.`,
+    solution: `1. Spring Events + @TransactionalEventListener(AFTER_COMMIT) + @Async로 레벨·챌린지·계획 업데이트를 비동기 분리했습니다. @Retryable(maxAttempts=3)로 실패 시 재시도합니다.
+2. Redis 캐싱을 도입해 activitySummary(5분), activeChallenges(10분), plans(30분) TTL로 조회 부하를 줄였습니다.
+3. JOIN FETCH 쿼리와 11개 복합 인덱스를 추가해 N+1 문제를 해결했습니다.
+4. k6 스크립트로 baseline, optimized, async-event, compression 시나리오를 작성하고 100 VU 부하로 Before/After를 측정했습니다.`,
+    result: `1. POST /activities 응답 시간: ~100ms → ~5ms (95% 감소), 비동기 이벤트로 메인 트랜잭션 분리.
+2. GET /activities/summary 응답 시간: 7.43ms → 1.01ms (86% 감소), Redis 캐시 적중.
+3. N+1 쿼리(5건 조회 시): 6회 → 1회 (83% 감소), JOIN FETCH 적용.
+4. 전체 처리량(TPS): 69.88 → 90.16 req/s (29% 향상), 에러율 0% 유지.
+5. Docker 이미지 크기: 350MB → 220MB (37% 감소), 멀티스테이지 빌드 + Alpine.`,
+    stack: [
+      "Java 17",
+      "Spring Boot 3",
+      "Spring Security",
+      "JWT",
+      "Spring Data JPA",
+      "PostgreSQL",
+      "Redis",
+      "Spring Events",
+      "React 18",
+      "TypeScript",
+      "Tailwind CSS",
+      "SwiftUI",
+      "HealthKit",
+      "Docker",
+      "Nginx",
+      "GitHub Actions",
+      "k6",
+      "Prometheus",
+    ],
+    githubUrl: "https://github.com/jinhyuk9714/Running_App",
+    demoUrl: "https://jinhyuk-portfolio1.shop",
+    imageUrl: null,
+  },
 ];
