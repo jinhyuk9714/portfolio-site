@@ -27,7 +27,7 @@ export default function ProjectList() {
     <section className="relative z-10 px-6 py-24 sm:py-32" id="projects">
       {/* Background */}
       <div className="absolute inset-0 bg-grid opacity-20" aria-hidden />
-      <div className="absolute inset-0 bg-gradient-to-b from-surface via-transparent to-surface" aria-hidden />
+      <div className="absolute inset-0 pointer-events-none" style={{ background: "linear-gradient(to bottom, var(--color-surface) 0%, transparent 15%, transparent 85%, var(--color-surface) 100%)" }} aria-hidden />
 
       <div className="relative mx-auto max-w-6xl">
         {/* Section header */}
@@ -39,7 +39,7 @@ export default function ProjectList() {
                 Projects
               </span>
             </div>
-            <div className="flex-1 h-px bg-gradient-to-r from-accent/30 to-transparent" aria-hidden />
+            <div className="flex-1 h-0.5 bg-gradient-to-r from-accent/70 to-transparent" aria-hidden />
           </div>
 
           <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">

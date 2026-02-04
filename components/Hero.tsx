@@ -76,7 +76,7 @@ export default function Hero() {
             {/* Role tag */}
             {profile.role && (
               <div className={`opacity-0 ${isLoaded ? "animate-fade-in-up" : ""}`}>
-                <span className="inline-block font-mono text-xs px-3 py-1.5 rounded bg-accent-soft border border-accent/20 text-accent tracking-wide uppercase">
+                <span className="inline-block font-mono text-xs px-3 py-1.5 rounded border text-accent tracking-wide uppercase" style={{ backgroundColor: "rgba(5, 150, 105, 0.1)", borderColor: "var(--color-accent)" }}>
                   {profile.role}
                 </span>
               </div>
@@ -183,7 +183,7 @@ export default function Hero() {
           style={{ animationDelay: "1.2s" }}
         >
           <span className="font-mono text-[10px] uppercase tracking-[0.3em] text-ink-tertiary">Scroll</span>
-          <div className="w-px h-12 bg-gradient-to-b from-accent/50 via-accent/20 to-transparent" />
+          <div className="w-0.5 h-12 bg-gradient-to-b from-accent via-accent/40 to-transparent" />
         </div>
       </div>
     </section>

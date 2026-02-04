@@ -39,8 +39,13 @@ export default function ProjectCard({ project, index }: ProjectCardProps) {
   return (
     <Link href={`/projects/${project.id}`} className="block group">
       <article
-        className="project-card opacity-0 relative rounded-2xl border border-surface-border bg-surface-card overflow-hidden transition-all duration-500 hover:border-accent/30 hover:shadow-card-hover hover-lift"
-        style={{ animationDelay: `${index * 0.1}s` }}
+        className="project-card opacity-0 relative rounded-2xl overflow-hidden transition-all duration-500 hover-lift"
+        style={{
+          animationDelay: `${index * 0.1}s`,
+          backgroundColor: "var(--color-surface-card)",
+          border: "1px solid var(--color-surface-border)",
+          boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
+        }}
       >
         {/* Gradient overlay on hover */}
         <div className="absolute inset-0 bg-card-gradient opacity-0 group-hover:opacity-100 transition-opacity duration-500" aria-hidden />
@@ -66,7 +71,7 @@ export default function ProjectCard({ project, index }: ProjectCardProps) {
               sizes="(max-width: 768px) 100vw, 50vw"
               unoptimized
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-surface-card via-transparent to-transparent" />
+            <div className="absolute inset-0" style={{ background: "linear-gradient(to top, var(--color-surface-card) 0%, transparent 50%)" }} />
           </div>
         ) : (
           <div className="relative w-full aspect-[16/9] bg-surface overflow-hidden">
@@ -82,7 +87,7 @@ export default function ProjectCard({ project, index }: ProjectCardProps) {
                 <div className="absolute -inset-4 border border-dashed border-surface-border rounded-2xl opacity-50" />
               </div>
             </div>
-            <div className="absolute inset-0 bg-gradient-to-t from-surface-card via-surface-card/80 to-transparent" />
+            <div className="absolute inset-0" style={{ background: "linear-gradient(to top, var(--color-surface-card) 0%, color-mix(in srgb, var(--color-surface-card) 80%, transparent) 40%, transparent 100%)" }} />
           </div>
         )}
 

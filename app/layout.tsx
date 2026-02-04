@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Sora, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { profile } from "@/data/profile";
+import { ThemeProvider } from "@/components/ThemeProvider";
+import ThemeToggle from "@/components/ThemeToggle";
 
 const sora = Sora({
   subsets: ["latin"],
@@ -32,11 +34,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ko" className={`${sora.variable} ${jetbrainsMono.variable}`}>
-      <body className="font-sans antialiased min-h-screen flex flex-col bg-surface text-ink-primary selection:bg-accent/30 selection:text-white">
-        <div className="noise-overlay" aria-hidden />
-        <div className="scanlines" aria-hidden />
-        {children}
+    <html lang="ko" className={`${sora.variable} ${jetbrainsMono.variable} dark`} suppressHydrationWarning>
+      <body className="font-sans antialiased min-h-screen flex flex-col bg-surface text-ink-primary selection:bg-accent/30 selection:text-white transition-colors duration-300">
+        <ThemeProvider>
+          <div className="noise-overlay" aria-hidden />
+          <div className="scanlines" aria-hidden />
+          <ThemeToggle />
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );

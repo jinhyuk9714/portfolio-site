@@ -1,25 +1,38 @@
 "use client";
 
-import { useLayoutEffect, useState, useRef } from "react";
+import { useLayoutEffect, useState, useRef, useEffect } from "react";
 import mermaid from "mermaid";
+import { useTheme } from "./ThemeProvider";
 
-let mermaidInitialized = false;
-function ensureMermaidInit() {
-  if (mermaidInitialized) return;
-  mermaid.initialize({
-    startOnLoad: false,
-    theme: "dark",
-    themeVariables: {
-      primaryColor: "#f59e0b",
-      primaryTextColor: "#fafafa",
-      primaryBorderColor: "#27272a",
-      lineColor: "#71717a",
-      secondaryColor: "#141416",
-      tertiaryColor: "#0a0a0b",
-    },
-  });
-  mermaidInitialized = true;
-}
+const darkThemeVars = {
+  primaryColor: "#00ff88",
+  primaryTextColor: "#f0f0f5",
+  primaryBorderColor: "#2a2a35",
+  lineColor: "#55556a",
+  secondaryColor: "#0c0c10",
+  tertiaryColor: "#050508",
+  background: "#050508",
+  mainBkg: "#0a0a0e",
+  nodeBorder: "#2a2a35",
+  clusterBkg: "#0c0c10",
+  titleColor: "#f0f0f5",
+  edgeLabelBackground: "#0a0a0e",
+};
+
+const lightThemeVars = {
+  primaryColor: "#047857",
+  primaryTextColor: "#111111",
+  primaryBorderColor: "#c0c0c0",
+  lineColor: "#4b5563",
+  secondaryColor: "#f3f4f6",
+  tertiaryColor: "#fafafa",
+  background: "#fafafa",
+  mainBkg: "#ffffff",
+  nodeBorder: "#d1d5db",
+  clusterBkg: "#f9fafb",
+  titleColor: "#111111",
+  edgeLabelBackground: "#ffffff",
+};
 
 interface MermaidDiagramProps {
   code: string;
@@ -27,17 +40,32 @@ interface MermaidDiagramProps {
 }
 
 export default function MermaidDiagram({ code, className = "" }: MermaidDiagramProps) {
+  const { theme } = useTheme();
   const idRef = useRef(
     `mermaid-${typeof crypto !== "undefined" && crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).slice(2)}`
   );
   const [svg, setSvg] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [renderKey, setRenderKey] = useState(0);
+
+  // Re-render when theme changes
+  useEffect(() => {
+    setRenderKey((k) => k + 1);
+  }, [theme]);
 
   useLayoutEffect(() => {
     if (!code.trim()) return;
 
-    ensureMermaidInit();
-    const renderId = idRef.current;
+    const isDark = theme === "dark";
+
+    // Re-initialize mermaid with current theme
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: isDark ? "dark" : "default",
+      themeVariables: isDark ? darkThemeVars : lightThemeVars,
+    });
+
+    const renderId = `${idRef.current}-${renderKey}`;
 
     mermaid
       .render(renderId, code.trim())
@@ -49,7 +77,7 @@ export default function MermaidDiagram({ code, className = "" }: MermaidDiagramP
         setError(err.message ?? "Mermaid 렌더 실패");
         setSvg(null);
       });
-  }, [code]);
+  }, [code, theme, renderKey]);
 
   if (error) {
     return (
@@ -69,7 +97,8 @@ export default function MermaidDiagram({ code, className = "" }: MermaidDiagramP
 
   return (
     <div
-      className={`min-h-[120px] rounded-xl overflow-hidden bg-surface border border-surface-border p-4 [&_svg]:max-w-full [&_svg]:h-auto ${className}`}
+      className={`min-h-[120px] rounded-xl overflow-hidden p-4 [&_svg]:max-w-full [&_svg]:h-auto ${className}`}
+      style={{ backgroundColor: "var(--color-surface-card)", borderColor: "var(--color-surface-border)" }}
       dangerouslySetInnerHTML={{ __html: svg }}
     />
   );
