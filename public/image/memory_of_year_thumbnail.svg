@@ -1,0 +1,116 @@
+<svg width="800" height="450" viewBox="0 0 800 450" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg4" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0a0a0e"/>
+      <stop offset="100%" style="stop-color:#050508"/>
+    </linearGradient>
+    <filter id="blur4" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="35"/>
+    </filter>
+    <filter id="glow4">
+      <feGaussianBlur stdDeviation="2" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <clipPath id="photoClip">
+      <rect x="0" y="0" width="120" height="90" rx="8"/>
+    </clipPath>
+  </defs>
+
+  <!-- Background -->
+  <rect width="800" height="450" fill="url(#bg4)"/>
+
+  <!-- Grid -->
+  <g opacity="0.05">
+    <line x1="0" y1="75" x2="800" y2="75" stroke="#a855f7" stroke-width="0.5"/>
+    <line x1="0" y1="150" x2="800" y2="150" stroke="#a855f7" stroke-width="0.5"/>
+    <line x1="0" y1="225" x2="800" y2="225" stroke="#a855f7" stroke-width="0.5"/>
+    <line x1="0" y1="300" x2="800" y2="300" stroke="#a855f7" stroke-width="0.5"/>
+    <line x1="0" y1="375" x2="800" y2="375" stroke="#a855f7" stroke-width="0.5"/>
+    <line x1="100" y1="0" x2="100" y2="450" stroke="#a855f7" stroke-width="0.5"/>
+    <line x1="200" y1="0" x2="200" y2="450" stroke="#a855f7" stroke-width="0.5"/>
+    <line x1="300" y1="0" x2="300" y2="450" stroke="#a855f7" stroke-width="0.5"/>
+    <line x1="400" y1="0" x2="400" y2="450" stroke="#a855f7" stroke-width="0.5"/>
+    <line x1="500" y1="0" x2="500" y2="450" stroke="#a855f7" stroke-width="0.5"/>
+    <line x1="600" y1="0" x2="600" y2="450" stroke="#a855f7" stroke-width="0.5"/>
+    <line x1="700" y1="0" x2="700" y2="450" stroke="#a855f7" stroke-width="0.5"/>
+  </g>
+
+  <!-- Glow orbs -->
+  <circle cx="200" cy="120" r="120" fill="#ff9500" opacity="0.1" filter="url(#blur4)"/>
+  <circle cx="600" cy="330" r="140" fill="#a855f7" opacity="0.12" filter="url(#blur4)"/>
+  <circle cx="400" cy="225" r="100" fill="#00d4ff" opacity="0.06" filter="url(#blur4)"/>
+
+  <!-- Album book -->
+  <g transform="translate(280, 100)">
+    <!-- Album cover -->
+    <rect width="240" height="200" rx="12" fill="#0c0c10" stroke="#2a2a35" stroke-width="2"/>
+    <rect x="10" y="10" width="220" height="180" rx="8" fill="#1a1a22"/>
+
+    <!-- Album spine -->
+    <rect x="-15" y="5" width="15" height="190" rx="2" fill="#ff9500" opacity="0.8"/>
+
+    <!-- Decorative pattern on cover -->
+    <g opacity="0.3">
+      <circle cx="120" cy="100" r="40" stroke="#a855f7" stroke-width="1" fill="none"/>
+      <circle cx="120" cy="100" r="55" stroke="#a855f7" stroke-width="0.5" fill="none"/>
+      <circle cx="120" cy="100" r="70" stroke="#a855f7" stroke-width="0.5" fill="none" stroke-dasharray="4 4"/>
+    </g>
+
+    <!-- Year text -->
+    <text x="120" y="108" text-anchor="middle" fill="#a855f7" font-family="monospace" font-size="24" font-weight="bold" filter="url(#glow4)">2024</text>
+    <text x="120" y="130" text-anchor="middle" fill="#55556a" font-family="monospace" font-size="10">MEMORIES</text>
+  </g>
+
+  <!-- Floating photos -->
+  <g transform="translate(560, 80) rotate(8)">
+    <rect width="100" height="75" rx="6" fill="#1a1a22" stroke="#2a2a35" stroke-width="1"/>
+    <rect x="5" y="5" width="90" height="55" rx="4" fill="#0a0a0e"/>
+    <rect x="10" y="10" width="80" height="45" fill="#2a2a35" opacity="0.5"/>
+    <!-- Photo placeholder icon -->
+    <circle cx="50" cy="32" r="12" stroke="#55556a" stroke-width="1" fill="none"/>
+    <path d="M44 38 l6 -8 l6 8" stroke="#55556a" stroke-width="1" fill="none"/>
+  </g>
+
+  <g transform="translate(600, 180) rotate(-5)">
+    <rect width="100" height="75" rx="6" fill="#1a1a22" stroke="#00d4ff" stroke-width="1" opacity="0.8"/>
+    <rect x="5" y="5" width="90" height="55" rx="4" fill="#0a0a0e"/>
+    <rect x="10" y="10" width="80" height="45" fill="#00d4ff" opacity="0.1"/>
+  </g>
+
+  <!-- Letter/envelope -->
+  <g transform="translate(100, 280)">
+    <path d="M0 20 L60 0 L120 20 L120 80 L0 80 Z" fill="#0c0c10" stroke="#ff9500" stroke-width="1.5"/>
+    <path d="M0 20 L60 50 L120 20" fill="none" stroke="#ff9500" stroke-width="1" opacity="0.6"/>
+    <line x1="20" y1="45" x2="100" y2="45" stroke="#2a2a35" stroke-width="1"/>
+    <line x1="20" y1="55" x2="80" y2="55" stroke="#2a2a35" stroke-width="1"/>
+    <line x1="20" y1="65" x2="60" y2="65" stroke="#2a2a35" stroke-width="1"/>
+  </g>
+
+  <!-- S3 cloud icon -->
+  <g transform="translate(580, 320)" opacity="0.6">
+    <path d="M30 40 a20 20 0 0 1 0 -40 a15 15 0 0 1 25 10 a12 12 0 0 1 0 24 h-45 a15 15 0 0 1 0 -30"
+          fill="none" stroke="#ff9500" stroke-width="1.5"/>
+    <text x="30" y="55" text-anchor="middle" fill="#ff9500" font-family="monospace" font-size="8">S3</text>
+  </g>
+
+  <!-- Connection dots -->
+  <circle cx="400" cy="320" r="3" fill="#a855f7" opacity="0.6"/>
+  <circle cx="450" cy="340" r="2" fill="#00d4ff" opacity="0.4"/>
+  <circle cx="350" cy="350" r="2" fill="#ff9500" opacity="0.4"/>
+
+  <!-- Sticker decorations -->
+  <g transform="translate(480, 130)" opacity="0.5">
+    <polygon points="15,0 19,11 30,11 21,18 25,30 15,22 5,30 9,18 0,11 11,11" fill="#ffd93d"/>
+  </g>
+
+  <g transform="translate(180, 200)" opacity="0.4">
+    <circle cx="12" cy="12" r="12" fill="#ff4757"/>
+    <path d="M12 6 v12 M6 12 h12" stroke="#0a0a0e" stroke-width="2"/>
+  </g>
+
+  <!-- Label -->
+  <text x="400" y="420" text-anchor="middle" fill="#55556a" font-family="monospace" font-size="14" letter-spacing="4">MEMORY OF YEAR</text>
+</svg>

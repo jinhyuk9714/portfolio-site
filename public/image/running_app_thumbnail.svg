@@ -1,0 +1,103 @@
+<svg width="800" height="450" viewBox="0 0 800 450" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg3" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0a0a0e"/>
+      <stop offset="100%" style="stop-color:#050508"/>
+    </linearGradient>
+    <linearGradient id="route" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#00ff88"/>
+      <stop offset="50%" style="stop-color:#00d4ff"/>
+      <stop offset="100%" style="stop-color:#a855f7"/>
+    </linearGradient>
+    <filter id="blur3" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="40"/>
+    </filter>
+    <filter id="glow3">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="800" height="450" fill="url(#bg3)"/>
+
+  <!-- Grid -->
+  <g opacity="0.06">
+    <line x1="0" y1="75" x2="800" y2="75" stroke="#00ff88" stroke-width="0.5"/>
+    <line x1="0" y1="150" x2="800" y2="150" stroke="#00ff88" stroke-width="0.5"/>
+    <line x1="0" y1="225" x2="800" y2="225" stroke="#00ff88" stroke-width="0.5"/>
+    <line x1="0" y1="300" x2="800" y2="300" stroke="#00ff88" stroke-width="0.5"/>
+    <line x1="0" y1="375" x2="800" y2="375" stroke="#00ff88" stroke-width="0.5"/>
+    <line x1="100" y1="0" x2="100" y2="450" stroke="#00ff88" stroke-width="0.5"/>
+    <line x1="200" y1="0" x2="200" y2="450" stroke="#00ff88" stroke-width="0.5"/>
+    <line x1="300" y1="0" x2="300" y2="450" stroke="#00ff88" stroke-width="0.5"/>
+    <line x1="400" y1="0" x2="400" y2="450" stroke="#00ff88" stroke-width="0.5"/>
+    <line x1="500" y1="0" x2="500" y2="450" stroke="#00ff88" stroke-width="0.5"/>
+    <line x1="600" y1="0" x2="600" y2="450" stroke="#00ff88" stroke-width="0.5"/>
+    <line x1="700" y1="0" x2="700" y2="450" stroke="#00ff88" stroke-width="0.5"/>
+  </g>
+
+  <!-- Glow orbs -->
+  <circle cx="200" cy="350" r="150" fill="#00ff88" opacity="0.1" filter="url(#blur3)"/>
+  <circle cx="600" cy="100" r="120" fill="#a855f7" opacity="0.08" filter="url(#blur3)"/>
+
+  <!-- GPS Route path -->
+  <path d="M100 320 Q 180 280 250 300 T 400 250 T 550 280 T 700 200"
+        stroke="url(#route)" stroke-width="4" fill="none" stroke-linecap="round" filter="url(#glow3)"/>
+
+  <!-- Route dots -->
+  <circle cx="100" cy="320" r="6" fill="#00ff88"/>
+  <circle cx="250" cy="300" r="4" fill="#00ff88" opacity="0.6"/>
+  <circle cx="400" cy="250" r="4" fill="#00d4ff" opacity="0.6"/>
+  <circle cx="550" cy="280" r="4" fill="#00d4ff" opacity="0.6"/>
+  <circle cx="700" cy="200" r="8" fill="#a855f7" filter="url(#glow3)"/>
+
+  <!-- Current position indicator -->
+  <circle cx="700" cy="200" r="20" stroke="#a855f7" stroke-width="2" fill="none" opacity="0.4">
+    <animate attributeName="r" values="15;25;15" dur="2s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0.6;0.2;0.6" dur="2s" repeatCount="indefinite"/>
+  </circle>
+
+  <!-- Heart rate monitor -->
+  <g transform="translate(80, 80)">
+    <rect width="180" height="80" rx="10" stroke="#1a1a22" stroke-width="1" fill="#0a0a0e" opacity="0.9"/>
+    <text x="20" y="25" fill="#55556a" font-family="monospace" font-size="10">HEART RATE</text>
+    <!-- ECG line -->
+    <path d="M20 55 l10 0 l5 -15 l5 25 l5 -35 l5 40 l5 -15 l10 0 l10 0 l5 -10 l5 15 l5 -25 l5 30 l5 -10 l20 0"
+          stroke="#ff4757" stroke-width="2" fill="none"/>
+    <text x="150" y="55" fill="#ff4757" font-family="monospace" font-size="18" font-weight="bold">142</text>
+    <text x="150" y="70" fill="#55556a" font-family="monospace" font-size="8">BPM</text>
+  </g>
+
+  <!-- Stats panel -->
+  <g transform="translate(540, 80)">
+    <rect width="180" height="80" rx="10" stroke="#1a1a22" stroke-width="1" fill="#0a0a0e" opacity="0.9"/>
+    <text x="20" y="25" fill="#55556a" font-family="monospace" font-size="10">DISTANCE</text>
+    <text x="20" y="55" fill="#00ff88" font-family="monospace" font-size="24" font-weight="bold">5.23</text>
+    <text x="95" y="55" fill="#55556a" font-family="monospace" font-size="12">km</text>
+    <text x="120" y="25" fill="#55556a" font-family="monospace" font-size="10">PACE</text>
+    <text x="120" y="55" fill="#00d4ff" font-family="monospace" font-size="18">5'42"</text>
+  </g>
+
+  <!-- Level indicator -->
+  <g transform="translate(310, 340)">
+    <rect width="180" height="50" rx="8" stroke="#ffd93d" stroke-width="1" fill="#0a0a0e" opacity="0.9"/>
+    <text x="15" y="32" fill="#ffd93d" font-family="monospace" font-size="14">LV.7</text>
+    <!-- Progress bar -->
+    <rect x="60" y="20" width="100" height="10" rx="5" fill="#1a1a22"/>
+    <rect x="60" y="20" width="72" height="10" rx="5" fill="#ffd93d"/>
+    <text x="165" y="30" fill="#55556a" font-family="monospace" font-size="10">72%</text>
+  </g>
+
+  <!-- Floating activity icons -->
+  <g transform="translate(350, 150)" opacity="0.4">
+    <circle cx="0" cy="0" r="25" stroke="#00ff88" stroke-width="1" fill="none"/>
+    <path d="M-8 5 l8 -15 l8 15 M0 -10 v20" stroke="#00ff88" stroke-width="2" fill="none"/>
+  </g>
+
+  <!-- Label -->
+  <text x="400" y="420" text-anchor="middle" fill="#55556a" font-family="monospace" font-size="14" letter-spacing="4">RUNNING APP</text>
+</svg>

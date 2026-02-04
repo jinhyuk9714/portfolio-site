@@ -1,16 +1,29 @@
 import type { Metadata } from "next";
-import { Plus_Jakarta_Sans } from "next/font/google";
+import { Sora, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
+import { profile } from "@/data/profile";
 
-const plusJakarta = Plus_Jakarta_Sans({
+const sora = Sora({
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-plus-jakarta",
+  weight: ["300", "400", "500", "600", "700"],
+  variable: "--font-sora",
+});
+
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ["latin"],
+  weight: ["400", "500", "600"],
+  variable: "--font-mono",
 });
 
 export const metadata: Metadata = {
-  title: "Portfolio",
-  description: "1페이지형 포트폴리오",
+  title: `${profile.name} | ${profile.role || "Developer"}`,
+  description: profile.headline,
+  keywords: profile.keywords?.join(", "),
+  openGraph: {
+    title: `${profile.name} | ${profile.role || "Developer"}`,
+    description: profile.headline,
+    type: "website",
+  },
 };
 
 export default function RootLayout({
@@ -19,8 +32,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ko" className={plusJakarta.variable}>
-      <body className="font-sans antialiased min-h-screen flex flex-col bg-surface text-ink-primary">
+    <html lang="ko" className={`${sora.variable} ${jetbrainsMono.variable}`}>
+      <body className="font-sans antialiased min-h-screen flex flex-col bg-surface text-ink-primary selection:bg-accent/30 selection:text-white">
+        <div className="noise-overlay" aria-hidden />
+        <div className="scanlines" aria-hidden />
         {children}
       </body>
     </html>

@@ -221,7 +221,7 @@ export const projects: Project[] = [
     ],
     githubUrl: "https://github.com/jinhyuk9714/timedeal-service",
     demoUrl: null,
-    imageUrl: null,
+    imageUrl: "/image/timedeal_thumbnail.svg",
   },
   {
     id: "msa-shop",
@@ -256,7 +256,7 @@ export const projects: Project[] = [
     ],
     githubUrl: "https://github.com/jinhyuk9714/msa-shop",
     demoUrl: null,
-    imageUrl: null,
+    imageUrl: "/image/msa_shop_thumbnail.svg",
   },
   {
     id: "running-app",
@@ -451,6 +451,6 @@ export const projects: Project[] = [
     ],
     githubUrl: "https://github.com/jinhyuk9714/Running_App",
     demoUrl: "https://jinhyuk-portfolio1.shop",
-    imageUrl: null,
+    imageUrl: "/image/running_app_thumbnail.svg",
   },
 ];
