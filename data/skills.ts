@@ -25,6 +25,16 @@ export const skillCategories: SkillCategory[] = [
       { name: "Spring Data JPA", level: 4 },
       { name: "Spring Cloud Gateway", level: 3 },
       { name: "Querydsl", level: 3 },
+      { name: "Resilience4j", level: 3 },
+    ],
+  },
+  {
+    category: "AI / RAG",
+    icon: "🤖",
+    skills: [
+      { name: "LangChain4j", level: 3 },
+      { name: "ChromaDB", level: 3 },
+      { name: "LLM API", level: 3 },
     ],
   },
   {
@@ -74,7 +84,9 @@ export const skillCategories: SkillCategory[] = [
     skills: [
       { name: "React", level: 3 },
       { name: "TypeScript", level: 3 },
+      { name: "Next.js", level: 3 },
       { name: "Tailwind CSS", level: 3 },
+      { name: "React Query", level: 3 },
       { name: "SwiftUI", level: 2 },
     ],
   },

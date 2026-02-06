@@ -116,7 +116,7 @@ export const projects: Project[] = [
     end
     subgraph AI_Infra["AI Infrastructure"]
       LC[LangChain4j]
-      LLM[OpenAI API]
+      LLM[Claude API]
     end
     subgraph Data
       PG[(PostgreSQL)]
@@ -220,7 +220,7 @@ export const projects: Project[] = [
     participant GW as Gateway
     participant IS as Interview Service
     participant AI as AI Service
-    participant LLM as OpenAI
+    participant LLM as Claude API
     participant CR as ChromaDB
     participant PG as PostgreSQL
     C->>GW: POST /api/interviews/jd
@@ -268,7 +268,7 @@ export const projects: Project[] = [
     participant C as Client
     participant GW as Gateway
     participant AI as AI Service
-    participant LLM as OpenAI
+    participant LLM as Claude API
     participant CR as ChromaDB
     participant RD as Redis
     C->>GW: GET /api/ai/feedback/{qnaId} (SSE)
