@@ -25,6 +25,11 @@ const stackColors: Record<string, string> = {
   "k6": "text-terminal-purple",
   "RabbitMQ": "text-terminal-orange",
   "JWT": "text-terminal-yellow",
+  "LangChain4j": "text-terminal-purple",
+  "Next.js 14": "text-ink-secondary",
+  "React Query": "text-terminal-red",
+  "ChromaDB": "text-terminal-green",
+  "Grafana": "text-terminal-orange",
   default: "text-ink-secondary",
 };
 

@@ -53,6 +53,280 @@ export function getDiagramLabel(type: DiagramType): string {
 
 export const projects: Project[] = [
   {
+    id: "interview-coach",
+    title: "AI Interview Coach",
+    summary:
+      "5개 MSA + LangChain4j RAG 파이프라인. SSE 실시간 피드백, ChromaDB 임베딩 검색, Redis 캐싱 60% 개선.",
+    detail:
+      "취업 준비생이 직무 기술 면접을 혼자 연습할 수 있는 AI 코칭 서비스입니다. JD를 분석해 맞춤 질문을 생성하고, RAG 기반으로 답변을 평가해 실시간 피드백을 제공합니다. MSA 설계, LangChain4j RAG 파이프라인, SSE 스트리밍, 동시성 제어 등 백엔드 핵심 기술을 종합적으로 경험한 프로젝트입니다.",
+    sections: [
+      {
+        title: "서비스 구성 (5개 독립 서비스)",
+        items: [
+          "API Gateway(8080): Spring Cloud Gateway, JWT 검증, 라우팅, Rate Limit",
+          "User Service(8081): 회원가입, 로그인(JWT), 프로필 관리",
+          "Interview Service(8082): JD 분석, 질문 생성, 모의 면접 세션 관리",
+          "AI Service(8083): LangChain4j + ChromaDB RAG, 답변 평가, SSE 피드백 스트리밍",
+          "Statistics Service(8084): 사용자별 면접 통계, 일별 활동 집계",
+        ],
+      },
+      {
+        title: "AI / RAG 파이프라인",
+        items: [
+          "LangChain4j로 JD 텍스트 → 직무 키워드 추출 → 맞춤 면접 질문 생성",
+          "ChromaDB 벡터 DB에 기술 면접 Q&A 임베딩 저장 (768차원)",
+          "사용자 답변 → 임베딩 변환 → ChromaDB 유사도 검색 → 컨텍스트 주입 → LLM 평가",
+          "SSE(Server-Sent Events)로 AI 피드백을 토큰 단위 실시간 스트리밍",
+        ],
+      },
+      {
+        title: "성능 최적화",
+        items: [
+          "N+1 문제: 면접 세션 목록 조회 시 @EntityGraph로 1쿼리 최적화",
+          "Race Condition: 통계 업데이트 시 비관적 락으로 동시성 제어",
+          "SSE Starvation: 피드백 스트리밍 시 별도 스레드풀(20개) 분리로 블로킹 방지",
+          "임베딩 배치: 개별 API 호출 → 배치 처리로 JD 분석 시간 40% 단축",
+          "Redis 캐싱: 질문 목록·통계 조회 TTL 캐싱으로 응답 60% 개선",
+        ],
+      },
+      {
+        title: "인프라 & DevOps",
+        items: [
+          "Docker Compose: 5개 서비스 + PostgreSQL + Redis + ChromaDB 일괄 기동",
+          "Kubernetes: Helm 차트, AI Service HPA(CPU 80% 기준 1-3 replicas)",
+          "Prometheus + Grafana: RPS, 레이턴시, JVM 메모리, AI 응답 시간 모니터링",
+          "GitHub Actions: CI(빌드+테스트) + CD(ghcr.io 이미지 푸시)",
+        ],
+      },
+    ],
+    diagramType: "architecture",
+    diagramUrl: null,
+    diagramMermaid: `flowchart LR
+    subgraph Client
+      FE[Next.js Frontend]
+    end
+    subgraph Gateway
+      GW[Spring Cloud Gateway]
+    end
+    subgraph Services
+      US[User Service]
+      IS[Interview Service]
+      AI[AI Service]
+      SS[Statistics Service]
+    end
+    subgraph AI_Infra["AI Infrastructure"]
+      LC[LangChain4j]
+      LLM[OpenAI API]
+    end
+    subgraph Data
+      PG[(PostgreSQL)]
+      RD[(Redis)]
+      CR[(ChromaDB)]
+    end
+    FE --> GW
+    GW --> US
+    GW --> IS
+    GW --> AI
+    GW --> SS
+    AI --> LC
+    LC --> LLM
+    LC --> CR
+    US --> PG
+    IS --> PG
+    SS --> PG
+    IS --> RD
+    AI --> RD`,
+    erdUrl: null,
+    erdMermaid: `erDiagram
+    users ||--o{ interview_sessions : "진행"
+    users ||--o{ user_statistics : "보유"
+    users ||--o{ daily_activity : "기록"
+    job_descriptions ||--o{ generated_questions : "생성"
+    interview_sessions ||--o{ interview_qna : "포함"
+    generated_questions ||--o{ interview_qna : "사용"
+
+    users {
+      bigint id PK
+      varchar email UK
+      varchar password
+      varchar nickname
+      varchar target_job
+      datetime created_at
+    }
+    job_descriptions {
+      bigint id PK
+      bigint user_id FK
+      text jd_text
+      varchar company_name
+      varchar position
+      json extracted_keywords
+      datetime created_at
+    }
+    generated_questions {
+      bigint id PK
+      bigint jd_id FK
+      text question_text
+      varchar category
+      varchar difficulty
+      text reference_answer
+    }
+    interview_sessions {
+      bigint id PK
+      bigint user_id FK
+      bigint jd_id FK
+      enum status
+      int total_questions
+      int answered_count
+      double avg_score
+      datetime started_at
+      datetime completed_at
+    }
+    interview_qna {
+      bigint id PK
+      bigint session_id FK
+      bigint question_id FK
+      text user_answer
+      text ai_feedback
+      double score
+      int order_num
+      datetime answered_at
+    }
+    user_statistics {
+      bigint id PK
+      bigint user_id FK
+      int total_sessions
+      int total_questions_answered
+      double avg_score
+      double best_score
+      varchar strongest_category
+      varchar weakest_category
+      datetime last_updated
+    }
+    daily_activity {
+      bigint id PK
+      bigint user_id FK
+      date activity_date
+      int sessions_count
+      int questions_count
+      double avg_score
+    }`,
+    sequenceDiagramUrl: null,
+    sequenceDiagramMermaid: null,
+    sequenceDiagrams: [
+      {
+        title: "JD 분석 & 질문 생성",
+        mermaid: `sequenceDiagram
+    participant C as Client
+    participant GW as Gateway
+    participant IS as Interview Service
+    participant AI as AI Service
+    participant LLM as OpenAI
+    participant CR as ChromaDB
+    participant PG as PostgreSQL
+    C->>GW: POST /api/interviews/jd
+    GW->>IS: JD 분석 요청
+    IS->>AI: JD 텍스트 전달
+    AI->>LLM: 키워드 추출 요청
+    LLM-->>AI: 직무 키워드
+    AI->>CR: 키워드 임베딩 유사도 검색
+    CR-->>AI: 관련 Q&A 컨텍스트
+    AI->>LLM: 컨텍스트 + 질문 생성 요청
+    LLM-->>AI: 맞춤 질문 목록
+    AI-->>IS: 생성된 질문
+    IS->>PG: 질문 저장
+    IS-->>GW: 질문 목록 응답
+    GW-->>C: 200 OK`,
+      },
+      {
+        title: "모의 면접 세션",
+        mermaid: `sequenceDiagram
+    participant C as Client
+    participant GW as Gateway
+    participant IS as Interview Service
+    participant PG as PostgreSQL
+    participant RD as Redis
+    C->>GW: POST /api/interviews/sessions
+    GW->>IS: 세션 생성
+    IS->>PG: 세션 저장
+    IS->>RD: 세션 상태 캐싱
+    IS-->>C: 세션 ID + 첫 질문
+    loop 각 질문마다
+      C->>GW: POST /api/interviews/sessions/{id}/answer
+      GW->>IS: 답변 제출
+      IS->>PG: QnA 저장
+      IS->>RD: 진행 상태 업데이트
+      IS-->>C: 다음 질문
+    end
+    C->>GW: POST /api/interviews/sessions/{id}/complete
+    GW->>IS: 세션 완료
+    IS->>PG: 최종 결과 저장
+    IS-->>C: 세션 요약`,
+      },
+      {
+        title: "AI 피드백 (SSE 스트리밍)",
+        mermaid: `sequenceDiagram
+    participant C as Client
+    participant GW as Gateway
+    participant AI as AI Service
+    participant LLM as OpenAI
+    participant CR as ChromaDB
+    participant RD as Redis
+    C->>GW: GET /api/ai/feedback/{qnaId} (SSE)
+    GW->>AI: SSE 연결
+    AI->>RD: 캐시 확인
+    alt 캐시 히트
+      AI-->>C: SSE: 캐싱된 피드백 전송
+    else 캐시 미스
+      AI->>CR: 답변 임베딩 유사도 검색
+      CR-->>AI: 참고 컨텍스트
+      AI->>LLM: 스트리밍 평가 요청
+      loop 토큰 단위
+        LLM-->>AI: 토큰
+        AI-->>C: SSE: data 토큰
+      end
+      AI->>RD: 전체 피드백 캐싱
+      AI-->>C: SSE: [DONE]
+    end`,
+      },
+    ],
+    problem: `1. 면접 세션 목록 조회 시 세션별 QnA 개수를 가져오기 위해 N+1 쿼리가 발생해 응답이 느렸습니다.
+2. 여러 사용자가 동시에 면접을 완료하면 통계 테이블 업데이트 시 Race Condition으로 데이터 정합성이 깨졌습니다.
+3. SSE 피드백 스트리밍이 서블릿 스레드를 점유해, 동시 요청이 많아지면 다른 API 응답이 지연되었습니다.
+4. JD 분석 시 키워드마다 개별 임베딩 API를 호출해 전체 처리 시간이 길었습니다.`,
+    solution: `1. @EntityGraph로 세션-QnA 연관관계를 즉시 로딩하고, @Query로 COUNT 서브쿼리를 사용해 1회 쿼리로 최적화했습니다.
+2. 통계 업데이트 시 비관적 락(@Lock(PESSIMISTIC_WRITE))을 적용하고, @Retryable(maxAttempts=3)로 락 획득 실패 시 재시도를 구현했습니다.
+3. SSE 전용 스레드풀(core 10, max 20)을 분리하고, AsyncTaskExecutor로 피드백 스트리밍을 비동기 처리해 서블릿 스레드 블로킹을 방지했습니다.
+4. LangChain4j의 배치 임베딩 API를 활용해 키워드를 한 번에 벡터화하고, Redis에 임베딩 결과를 24시간 TTL로 캐싱했습니다.`,
+    result: `1. 면접 세션 목록 API: N+1(세션 수+1) → 1회 쿼리, 응답 시간 65% 개선.
+2. 동시 통계 업데이트: Race Condition 해소, 100명 동시 완료 테스트에서 데이터 정합성 100% 유지.
+3. SSE 스레드풀 분리: 동시 50명 피드백 스트리밍 중에도 일반 API p95 응답 시간 50ms 이내 유지.
+4. 임베딩 배치 + 캐싱: JD 분석 시간 40% 단축, Redis 캐시 적용으로 반복 조회 60% 개선.`,
+    stack: [
+      "Java 21",
+      "Spring Boot 3",
+      "Spring Security",
+      "Spring Cloud Gateway",
+      "Spring Data JPA",
+      "JWT",
+      "LangChain4j",
+      "Next.js 14",
+      "TypeScript",
+      "React Query",
+      "PostgreSQL",
+      "Redis",
+      "ChromaDB",
+      "Docker",
+      "Kubernetes",
+      "Prometheus",
+      "Grafana",
+      "GitHub Actions",
+      "k6",
+    ],
+    githubUrl: "https://github.com/jinhyuk9714/interview-coach",
+    demoUrl: null,
+    imageUrl: null,
+  },
+  {
     id: "memory-of-year",
     title: "Memory of Year",
     summary:

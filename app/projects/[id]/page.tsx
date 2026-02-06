@@ -50,6 +50,11 @@ const stackColors: Record<string, string> = {
   "Querydsl": "text-terminal-cyan border-terminal-cyan/20",
   "Testcontainers": "text-terminal-cyan border-terminal-cyan/20",
   "Springdoc OpenAPI": "text-terminal-green border-terminal-green/20",
+  "LangChain4j": "text-terminal-purple border-terminal-purple/20",
+  "Next.js 14": "text-ink-secondary border-ink-muted/20",
+  "React Query": "text-terminal-red border-terminal-red/20",
+  "ChromaDB": "text-terminal-green border-terminal-green/20",
+  "Grafana": "text-terminal-orange border-terminal-orange/20",
   default: "text-ink-secondary border-surface-border-light",
 };
 
